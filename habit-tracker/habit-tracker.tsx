@@ -300,14 +300,14 @@ export default function HabitTracker() {
   const [accentColor, setAccentColor] = useState("blue");
   const [streakView, setStreakView] = useState("weekly");
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [profileName, setProfileName] = useState("John Doe");
+  const [profileEmail, setProfileEmail] = useState("john.doe@example.com");
+  const [profileTimeZone, setProfileTimeZone] = useState("Eastern Time (ET)");
+
   // Refs
   const sidebarRef = useRef(null);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
-  // if (!mounted) return null;
   // Effects
   useEffect(() => {
     // Show a random motivational quote
@@ -372,32 +372,32 @@ export default function HabitTracker() {
   const getAccentColorClass = (type) => {
     const colorMap = {
       blue: {
-        bg: "bg-blue-500",
-        text: "text-blue-500",
-        border: "border-blue-500",
-        hover: "hover:bg-blue-600",
-        progress: "bg-blue-500",
+        bg: darkMode ? "bg-blue-500" : "bg-blue-600",
+        text: darkMode ? "text-blue-500" : "text-blue-600",
+        border: darkMode ? "border-blue-500" : "border-blue-600",
+        hover: darkMode ? "hover:bg-blue-600" : "hover:bg-blue-700",
+        progress: darkMode ? "bg-blue-500" : "bg-blue-600",
       },
       green: {
-        bg: "bg-green-500",
-        text: "text-green-500",
-        border: "border-green-500",
-        hover: "hover:bg-green-600",
-        progress: "bg-green-500",
+        bg: darkMode ? "bg-green-500" : "bg-green-600",
+        text: darkMode ? "text-green-500" : "text-green-600",
+        border: darkMode ? "border-green-500" : "border-green-600",
+        hover: darkMode ? "hover:bg-green-600" : "hover:bg-green-700",
+        progress: darkMode ? "bg-green-500" : "bg-green-600",
       },
       yellow: {
-        bg: "bg-yellow-500",
-        text: "text-yellow-500",
-        border: "border-yellow-500",
-        hover: "hover:bg-yellow-600",
-        progress: "bg-yellow-500",
+        bg: darkMode ? "bg-yellow-500" : "bg-yellow-600",
+        text: darkMode ? "text-yellow-500" : "text-yellow-600",
+        border: darkMode ? "border-yellow-500" : "border-yellow-600",
+        hover: darkMode ? "hover:bg-yellow-600" : "hover:bg-yellow-700",
+        progress: darkMode ? "bg-yellow-500" : "bg-yellow-600",
       },
       purple: {
-        bg: "bg-purple-500",
-        text: "text-purple-500",
-        border: "border-purple-500",
-        hover: "hover:bg-purple-600",
-        progress: "bg-purple-500",
+        bg: darkMode ? "bg-purple-500" : "bg-purple-600",
+        text: darkMode ? "text-purple-500" : "text-purple-600",
+        border: darkMode ? "border-purple-500" : "border-purple-600",
+        hover: darkMode ? "hover:bg-purple-600" : "hover:bg-purple-700",
+        progress: darkMode ? "bg-purple-500" : "bg-purple-600",
       },
     };
 
@@ -414,15 +414,22 @@ export default function HabitTracker() {
       const habitName = habit.name.toLowerCase().replace(/\s+/g, "");
 
       updatedData[todayIndex][habitName] = value;
+      const wasCompleted =
+        updatedData[todayIndex].completed?.[habitName] || false;
       updatedData[todayIndex].completed[habitName] = value >= habit.target;
 
       // Add XP for completing a habit
-      if (value >= habit.target) {
+      if (value >= habit.target && !wasCompleted) {
         setXp((prev) => prev + 10);
 
         // Level up if XP reaches threshold
         if (xp + 10 >= level * 300) {
           setLevel((prev) => prev + 1);
+        }
+
+        // Show motivational quote for exercise or meditation completion
+        if (habitName === "exercise" || habitName === "meditation") {
+          showTaskCompletionQuote(habitName);
         }
       }
 
@@ -474,6 +481,9 @@ export default function HabitTracker() {
 
     setHabitData(updatedData);
 
+    // Set the newly added habit as the selected habit for streak
+    setSelectedHabitForStreak(habitName);
+
     // Reset form
     setNewHabit({
       name: "",
@@ -500,7 +510,40 @@ export default function HabitTracker() {
     setNotifications(notifications.filter((notif) => notif.id !== id));
   };
 
-  // Render functions
+  const isTargetExceeded = (habitName, value) => {
+    if (habitName === "screenTime" && value > 2) return true;
+    if (habitName === "sleep" && value > 9) return true;
+    return false;
+  };
+
+  const showTaskCompletionQuote = (habitName) => {
+    const exerciseQuotes = [
+      "Great job on your workout! Your body thanks you.",
+      "Exercise is a celebration of what your body can do!",
+      "You're getting stronger every day!",
+    ];
+
+    const meditationQuotes = [
+      "Meditation is the key to a peaceful mind.",
+      "A moment of mindfulness brings a lifetime of clarity.",
+      "Your mind is now clearer than before.",
+    ];
+
+    if (habitName === "exercise") {
+      setCurrentQuote(
+        exerciseQuotes[Math.floor(Math.random() * exerciseQuotes.length)]
+      );
+      setShowMotivationalQuote(true);
+      setTimeout(() => setShowMotivationalQuote(false), 5000);
+    } else if (habitName === "meditation") {
+      setCurrentQuote(
+        meditationQuotes[Math.floor(Math.random() * meditationQuotes.length)]
+      );
+      setShowMotivationalQuote(true);
+      setTimeout(() => setShowMotivationalQuote(false), 5000);
+    }
+  };
+
   const renderSidebar = () => {
     return (
       <AnimatePresence>
@@ -704,13 +747,19 @@ export default function HabitTracker() {
   const renderHeader = () => {
     return (
       <header
-        className="p-4 flex justify-between items-center bg-black text-white border-b border-gray-800"
+        className={`p-4 flex justify-between items-center ${
+          darkMode ? "bg-black" : "bg-white"
+        } ${darkMode ? "text-white" : "text-gray-900"} border-b ${
+          darkMode ? "border-gray-800" : "border-gray-200"
+        }`}
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
         <div className="flex items-center space-x-4">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-full hover:bg-gray-800"
+            className={`p-2 rounded-full ${
+              darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+            }`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -758,14 +807,74 @@ export default function HabitTracker() {
             ></button>
           </div>
 
-          <span className="text-yellow-500 font-medium">
-            ✨ {xp} XP (Lv. {level})
+          <button
+            onClick={() => {
+              document.body.classList.add("mode-transition");
+              setDarkMode(!darkMode);
+              setTimeout(() => {
+                document.body.classList.remove("mode-transition");
+              }, 2000);
+            }}
+            className={`p-2 rounded-full ${
+              darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+            }`}
+          >
+            {darkMode ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
+            )}
+          </button>
+
+          <span className="text-yellow-500 font-medium border border-yellow-500/30 rounded-full px-3 py-1 flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-1 text-yellow-500"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {xp} XP (Lv. {level})
           </span>
 
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 rounded-full hover:bg-gray-800 relative"
+              className={`p-2 rounded-full ${
+                darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+              } relative`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -789,8 +898,18 @@ export default function HabitTracker() {
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-black rounded-lg shadow-lg z-50 overflow-hidden border border-gray-800">
-                <div className="p-3 border-b border-gray-800">
+              <div
+                className={`absolute right-0 mt-2 w-80 ${
+                  darkMode ? "bg-black" : "bg-white"
+                } rounded-lg shadow-lg z-50 overflow-hidden border ${
+                  darkMode ? "border-gray-800" : "border-gray-200"
+                }`}
+              >
+                <div
+                  className={`p-3 border-b ${
+                    darkMode ? "border-gray-800" : "border-gray-200"
+                  }`}
+                >
                   <h3 className="font-medium">Notifications</h3>
                 </div>
 
@@ -799,10 +918,18 @@ export default function HabitTracker() {
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className="p-3 border-b border-gray-800 flex justify-between items-start"
+                        className={`p-3 border-b ${
+                          darkMode ? "border-gray-800" : "border-gray-200"
+                        } flex justify-between items-start`}
                       >
                         <div>
-                          <p className="text-sm text-black bg-white bg-opacity-10 p-2 rounded">
+                          <p
+                            className={`text-sm ${
+                              darkMode ? "text-gray-300" : "text-gray-700"
+                            } ${
+                              darkMode ? "bg-gray-800" : "bg-gray-100"
+                            } p-2 rounded`}
+                          >
                             {notification.message}
                           </p>
                           <p className="text-xs text-gray-400 mt-1">
@@ -850,11 +977,7 @@ export default function HabitTracker() {
       </header>
     );
   };
-  // useEffect(() => {
-  //   setMounted(true);
-  // }, []);
 
-  if (!mounted) return null;
   const renderDashboard = () => {
     const todayData = getTodayData();
 
@@ -871,7 +994,9 @@ export default function HabitTracker() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="p-4 rounded-lg border border-gray-700 bg-transparent"
+              className={`p-4 rounded-lg border ${
+                darkMode ? "border-white" : "border-black"
+              } ${darkMode ? "bg-transparent" : "bg-white"}`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <div className="flex justify-between items-start mb-4">
@@ -879,36 +1004,76 @@ export default function HabitTracker() {
                   <span className="text-2xl mr-2">{habit.icon}</span>
                   <div>
                     <h3 className="font-medium">{habit.name}</h3>
-                    <p className="text-sm text-gray-400">
+                    <p
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       Target: {habit.target} {habit.unit} ({habit.frequency})
                     </p>
                   </div>
                 </div>
                 <div
                   className={`w-3 h-3 rounded-full ${
-                    isCompleted ? "bg-green-500" : "bg-gray-600"
+                    isCompleted
+                      ? "bg-green-500"
+                      : darkMode
+                      ? "bg-gray-600"
+                      : "bg-gray-300"
                   }`}
                 ></div>
               </div>
 
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-400">Progress</span>
-                  <span className="text-sm font-medium">
+                  <span
+                    className={`text-sm ${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    Progress
+                  </span>
+                  <span
+                    className={`text-sm font-medium ${
+                      isTargetExceeded(habitName, value)
+                        ? "text-red-500"
+                        : isCompleted
+                        ? "text-green-500"
+                        : ""
+                    }`}
+                  >
                     {value} / {habit.target} {habit.unit}
                   </span>
                 </div>
-                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className={`w-full h-2 ${
+                    darkMode ? "bg-gray-800" : "bg-gray-200"
+                  } rounded-full overflow-hidden relative`}
+                >
                   <div
-                    className={`h-full rounded-full ${getAccentColorClass(
-                      "bg"
-                    )}`}
+                    className={`h-full rounded-full ${
+                      habitName === "water" && isCompleted
+                        ? "water-wave-animation"
+                        : getAccentColorClass("bg")
+                    }`}
                     style={{
                       width: `${Math.min(100, (value / habit.target) * 100)}%`,
                     }}
-                  ></div>
+                  >
+                    {habitName === "water" && isCompleted && (
+                      <div className="water-wave">
+                        <svg className="water-wave-svg" viewBox="0 0 1440 320">
+                          <path
+                            className="water-wave-path"
+                            d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320L0,320Z"
+                          ></path>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-1">
                   <svg
@@ -933,7 +1098,11 @@ export default function HabitTracker() {
                 <div className="flex space-x-1">
                   <button
                     onClick={() => logHabit(habit.id, Math.max(0, value - 1))}
-                    className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700"
+                    className={`w-8 h-8 rounded-full ${
+                      darkMode ? "bg-gray-800" : "bg-gray-200"
+                    } flex items-center justify-center ${
+                      darkMode ? "hover:bg-gray-700" : "hover:bg-gray-300"
+                    }`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -983,7 +1152,6 @@ export default function HabitTracker() {
   };
 
   const renderCharts = () => {
-    // Prepare data for charts
     const last7Days = habitData.slice(-7);
     const chartData = last7Days.map((day) => ({
       date: format(parseISO(day.date), "MMM dd"),
@@ -994,33 +1162,42 @@ export default function HabitTracker() {
       reading: day.reading,
       exercise: day.exercise,
     }));
-
-    // Get color for charts based on accent color
+  
     const getChartColor = () => {
-      const colorMap = {
+      const colorMap: Record<string, string> = {
         blue: "#3b82f6",
         green: "#10b981",
         yellow: "#f59e0b",
         purple: "#8b5cf6",
       };
-      return colorMap[accentColor];
+      return colorMap[accentColor] || "#3b82f6";
     };
-
+  
+    const strokeColor = darkMode ? "#fff" : "#000";
+    const tooltipBg = darkMode ? "#000" : "#fff";
+    const tooltipBorder = darkMode ? "#333" : "#ccc";
+  
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Line Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="p-4 rounded-lg border border-gray-700 bg-transparent"
+          className={`p-4 rounded-lg border ${darkMode ? "border-white" : "border-black"} bg-transparent`}
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4" style={{ color: strokeColor }}>
             <h3 className="font-medium">Activity Tracking</h3>
             <select
               value={chartMetric}
               onChange={(e) => setChartMetric(e.target.value)}
-              className="text-sm p-1 rounded border border-gray-700 bg-black"
+              className="text-sm p-1 rounded border"
+              style={{
+                borderColor: darkMode ? "#4B5563" : "#D1D5DB",
+                backgroundColor: darkMode ? "#000" : "#fff",
+                color: strokeColor,
+              }}
             >
               <option value="sleep">Sleep</option>
               <option value="screenTime">Screen Time</option>
@@ -1029,64 +1206,85 @@ export default function HabitTracker() {
               <option value="exercise">Exercise</option>
             </select>
           </div>
-
+  
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="date" stroke="#fff" />
-                <YAxis stroke="#fff" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#000",
-                    borderColor: "#333",
-                  }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? "#333" : "#ccc"} />
+                <XAxis dataKey="date" stroke={strokeColor} />
+                <YAxis stroke={strokeColor} />
+                <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderColor: tooltipBorder }} />
                 <Legend />
                 <Line
                   type="monotone"
                   dataKey={chartMetric}
                   stroke={getChartColor()}
                   strokeWidth={2}
-                  name={`${
-                    chartMetric.charAt(0).toUpperCase() + chartMetric.slice(1)
-                  } (${
-                    chartMetric === "sleep" || chartMetric === "screenTime"
-                      ? "hours"
-                      : "minutes"
-                  })`}
+                  name={`${chartMetric.charAt(0).toUpperCase() + chartMetric.slice(1)} ${
+                    chartMetric === "sleep" || chartMetric === "screenTime" ? "(hours)" : "(minutes)"
+                  }`}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
-
+  
+        {/* Bar Chart with Wave Animation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="p-4 rounded-lg border border-gray-700 bg-transparent"
+          className={`p-4 rounded-lg border ${darkMode ? "border-white" : "border-black"} bg-transparent`}
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
           <h3 className="font-medium mb-4">Water Intake (Last 7 Days)</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="date" stroke="#fff" />
-                <YAxis stroke="#fff" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#000",
-                    borderColor: "#333",
-                  }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? "#333" : "#ccc"} />
+                <XAxis dataKey="date" stroke={strokeColor} />
+                <YAxis stroke={strokeColor} />
+                <Tooltip contentStyle={{ backgroundColor: tooltipBg, borderColor: tooltipBorder }} />
                 <Legend />
                 <Bar
                   dataKey="water"
                   name="Water (glasses)"
                   fill={getChartColor()}
+                  shape={(props) => {
+                    const { x, y, width, height } = props;
+                    return (
+                      <g>
+                        <rect x={x} y={y} width={width} height={height} fill={getChartColor()} />
+                        <rect
+                          x={x}
+                          y={y}
+                          width={width}
+                          height={height}
+                          fill="url(#wavePattern)"
+                        />
+                      </g>
+                    );
+                  }}
                 />
+                <defs>
+                  <pattern
+                    id="wavePattern"
+                    patternUnits="userSpaceOnUse"
+                    width="10"
+                    height="10"
+                    patternTransform="rotate(45)"
+                  >
+                    <animateTransform
+                      attributeName="patternTransform"
+                      type="translate"
+                      from="0,0"
+                      to="10,10"
+                      dur="1s"
+                      repeatCount="indefinite"
+                    />
+                    <circle cx="5" cy="5" r="3" fill={getChartColor()} fillOpacity="0.4" />
+                  </pattern>
+                </defs>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -1094,9 +1292,7 @@ export default function HabitTracker() {
       </div>
     );
   };
-
-  const renderStreakCalendar = () => {
-    // Generate calendar data based on view (weekly or monthly)
+    const renderStreakCalendar = () => {
     const today = new Date();
     const days = [];
 
@@ -1106,7 +1302,6 @@ export default function HabitTracker() {
         days.push(addDays(startOfCurrentWeek, i));
       }
     } else {
-      // Monthly view
       const monthStart = startOfMonth(today);
       const monthEnd = endOfMonth(today);
       let currentDay = monthStart;
@@ -1117,15 +1312,17 @@ export default function HabitTracker() {
       }
     }
 
-    // Get data for selected habit
     const habitName = selectedHabitForStreak.toLowerCase().replace(/\s+/g, "");
+    const streakColor = darkMode ? "bg-gray-800" : "bg-white";
 
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}
-        className="p-4 rounded-lg border border-gray-700 bg-transparent mb-8"
+        className={`p-4 mb-8 rounded-lg border ${
+          darkMode ? "border-white" : "border-black"
+        } bg-transparent`}
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
         <div className="flex justify-between items-center mb-4">
@@ -1134,7 +1331,11 @@ export default function HabitTracker() {
             <select
               value={selectedHabitForStreak}
               onChange={(e) => setSelectedHabitForStreak(e.target.value)}
-              className="text-sm p-1 rounded border border-gray-700 bg-black"
+              className={`text-sm p-1 rounded border ${
+                darkMode
+                  ? "border-gray-700 bg-black text-white"
+                  : "border-gray-300 bg-white text-black"
+              }`}
             >
               <option value="water">Water Intake</option>
               <option value="sleep">Sleep</option>
@@ -1143,10 +1344,15 @@ export default function HabitTracker() {
               <option value="reading">Reading</option>
               <option value="exercise">Exercise</option>
             </select>
+
             <select
               value={streakView}
               onChange={(e) => setStreakView(e.target.value)}
-              className="text-sm p-1 rounded border border-gray-700 bg-black"
+              className={`text-sm p-1 rounded border ${
+                darkMode
+                  ? "border-gray-700 bg-black text-white"
+                  : "border-gray-300 bg-white text-black"
+              }`}
             >
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
@@ -1179,7 +1385,7 @@ export default function HabitTracker() {
                           ${
                             isCompleted
                               ? getAccentColorClass("bg") + " text-white"
-                              : "bg-gray-800"
+                              : streakColor
                           }`}
                       >
                         {format(day, "d")}
@@ -1199,7 +1405,6 @@ export default function HabitTracker() {
                   </div>
                 ))}
 
-                {/* Add empty cells for days before the start of the month */}
                 {Array.from({ length: startOfMonth(today).getDay() }).map(
                   (_, i) => (
                     <div key={`empty-${i}`} className="w-8 h-8"></div>
@@ -1236,7 +1441,7 @@ export default function HabitTracker() {
           </div>
 
           <div className="border-l border-gray-700 pl-4">
-            <h4 className="font-medium mb-3">Streak Details</h4>
+            <h4 className="font-medium mb-3">Final Analysis</h4>
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <svg
@@ -1299,7 +1504,7 @@ export default function HabitTracker() {
                   />
                 </svg>
                 <span>
-                  Best streak: {Math.max(streaks[habitName] || 0, 5)} days
+                  Best streak: {Math.max(streaks[habitName] || 0, 1)} days
                 </span>
               </div>
 
@@ -1317,14 +1522,15 @@ export default function HabitTracker() {
       </motion.div>
     );
   };
-
   const renderDatePicker = () => {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.4 }}
-        className="p-4 rounded-lg border border-gray-700 bg-transparent mb-8"
+        className={`p-4 rounded-lg border ${
+          darkMode ? "border-white" : "border-black"
+        } bg-transparent`}
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1334,7 +1540,11 @@ export default function HabitTracker() {
               type="date"
               value={format(selectedDate, "yyyy-MM-dd")}
               onChange={(e) => setSelectedDate(parseISO(e.target.value))}
-              className="w-full p-2 rounded border border-gray-700 bg-black text-white"
+              className="w-full p-2 rounded border border-gray-700 "
+              style={{
+                backgroundColor: darkMode ? "#000" : "#fff",
+                color: darkMode ? "#fff" : "#000",
+              }}
             />
 
             <div className="mt-4">
@@ -1735,6 +1945,31 @@ export default function HabitTracker() {
 
             <div className="flex justify-between items-center">
               <div>
+                <h4 className="font-medium">Dark Mode</h4>
+                <p className="text-sm text-gray-400">
+                  Toggle between light and dark mode
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  document.body.classList.add("mode-transition");
+                  setDarkMode(!darkMode);
+                  setTimeout(() => {
+                    document.body.classList.remove("mode-transition");
+                  }, 2000);
+                }}
+                className={`w-12 h-6 rounded-full flex items-center ${
+                  darkMode ? getAccentColorClass("bg") : "bg-gray-400"
+                } ${
+                  darkMode ? "justify-end" : "justify-start"
+                } transition-colors`}
+              >
+                <span className="w-5 h-5 rounded-full bg-white shadow-md transform transition-transform mx-0.5"></span>
+              </button>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <div>
                 <h4 className="font-medium">Motivational Quotes</h4>
                 <p className="text-sm text-gray-400">
                   Show daily motivational quotes
@@ -1782,8 +2017,8 @@ export default function HabitTracker() {
                 JD
               </div>
               <div>
-                <h4 className="font-medium">John Doe</h4>
-                <p className="text-sm text-gray-400">john.doe@example.com</p>
+                <h4 className="font-medium">{profileName}</h4>
+                <p className="text-sm text-gray-400">{profileEmail}</p>
               </div>
             </div>
 
@@ -1811,13 +2046,19 @@ export default function HabitTracker() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${
+              darkMode ? "bg-black bg-opacity-70" : "bg-gray-500 bg-opacity-50"
+            } flex items-center justify-center z-50 p-4`}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md rounded-lg border border-gray-700 bg-black p-6"
+              className={`w-full max-w-md rounded-lg border ${
+                darkMode
+                  ? "border-gray-700 bg-black"
+                  : "border-gray-300 bg-white"
+              } p-6`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <h3 className="text-xl font-bold mb-4">Add New Habit</h3>
@@ -1833,7 +2074,11 @@ export default function HabitTracker() {
                     onChange={(e) =>
                       setNewHabit({ ...newHabit, name: e.target.value })
                     }
-                    className="w-full p-2 rounded border border-gray-700 bg-black"
+                    className={`w-full p-2 rounded border ${
+                      darkMode
+                        ? "border-gray-700 bg-black"
+                        : "border-gray-300 bg-white"
+                    }`}
                     placeholder="e.g., Meditation"
                   />
                 </div>
@@ -1859,7 +2104,9 @@ export default function HabitTracker() {
                         className={`p-2 rounded-lg text-xl ${
                           newHabit.icon === icon
                             ? getAccentColorClass("bg")
-                            : "bg-gray-800"
+                            : darkMode
+                            ? "bg-gray-800"
+                            : "bg-gray-200"
                         }`}
                       >
                         {icon}
@@ -1883,7 +2130,11 @@ export default function HabitTracker() {
                           target: Number.parseInt(e.target.value) || 1,
                         })
                       }
-                      className="w-full p-2 rounded border border-gray-700 bg-black"
+                      className={`w-full p-2 rounded border ${
+                        darkMode
+                          ? "border-gray-700 bg-black"
+                          : "border-gray-300 bg-white"
+                      }`}
                     />
                   </div>
 
@@ -1896,7 +2147,11 @@ export default function HabitTracker() {
                       onChange={(e) =>
                         setNewHabit({ ...newHabit, unit: e.target.value })
                       }
-                      className="w-full p-2 rounded border border-gray-700 bg-black"
+                      className={`w-full p-2 rounded border ${
+                        darkMode
+                          ? "border-gray-700 bg-black"
+                          : "border-gray-300 bg-white"
+                      }`}
                     >
                       <option value="times">times</option>
                       <option value="minutes">minutes</option>
@@ -1916,7 +2171,11 @@ export default function HabitTracker() {
                     onChange={(e) =>
                       setNewHabit({ ...newHabit, frequency: e.target.value })
                     }
-                    className="w-full p-2 rounded border border-gray-700 bg-black"
+                    className={`w-full p-2 rounded border ${
+                      darkMode
+                        ? "border-gray-700 bg-black"
+                        : "border-gray-300 bg-white"
+                    }`}
                   >
                     <option value="daily">Daily</option>
                     <option value="weekdays">Weekdays</option>
@@ -1930,7 +2189,11 @@ export default function HabitTracker() {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowAddHabit(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                  className={`px-4 py-2 rounded-lg ${
+                    darkMode
+                      ? "bg-gray-800 hover:bg-gray-700"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
                 >
                   Cancel
                 </button>
@@ -1961,20 +2224,28 @@ export default function HabitTracker() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${
+              darkMode ? "bg-black bg-opacity-70" : "bg-gray-500 bg-opacity-50"
+            } flex items-center justify-center z-50 p-4`}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md rounded-lg border border-gray-700 bg-black p-6"
+              className={`w-full max-w-md rounded-lg border ${
+                darkMode
+                  ? "border-gray-700 bg-black"
+                  : "border-gray-300 bg-white"
+              } p-6`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">Weekly Summary</h3>
                 <button
                   onClick={() => setShowWeeklySummary(false)}
-                  className="p-1 rounded-full hover:bg-gray-800"
+                  className={`p-1 rounded-full ${
+                    darkMode ? "hover:bg-gray-800" : "hover:bg-gray-200"
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -2002,7 +2273,11 @@ export default function HabitTracker() {
                   times!
                 </p>
 
-                <div className="p-4 rounded-lg border border-gray-700">
+                <div
+                  className={`p-4 rounded-lg border ${
+                    darkMode ? "border-gray-700" : "border-gray-300"
+                  }`}
+                >
                   <h4 className="font-medium mb-2">Top Performing Habits</h4>
                   <ul className="space-y-1">
                     <li className="flex items-center">
@@ -2020,7 +2295,11 @@ export default function HabitTracker() {
                   </ul>
                 </div>
 
-                <div className="p-4 rounded-lg border border-gray-700">
+                <div
+                  className={`p-4 rounded-lg border ${
+                    darkMode ? "border-gray-700" : "border-gray-300"
+                  }`}
+                >
                   <h4 className="font-medium mb-2">Areas to Improve</h4>
                   <ul className="space-y-1">
                     <li className="flex items-center">
@@ -2070,7 +2349,11 @@ export default function HabitTracker() {
             className="fixed bottom-4 right-4 z-50"
           >
             <div
-              className="p-4 rounded-lg border border-gray-700 bg-black max-w-sm"
+              className={`p-4 rounded-lg border ${
+                darkMode
+                  ? "border-gray-700 bg-black"
+                  : "border-gray-300 bg-white"
+              } max-w-sm`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <div className="flex items-start space-x-3">
@@ -2094,7 +2377,11 @@ export default function HabitTracker() {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-medium">Reminder</h4>
-                  <p className="text-sm text-gray-300 mt-1">
+                  <p
+                    className={`text-sm ${
+                      darkMode ? "text-gray-300" : "text-gray-600"
+                    } mt-1`}
+                  >
                     {reminderMessage}
                   </p>
                 </div>
@@ -2136,7 +2423,11 @@ export default function HabitTracker() {
             className="fixed bottom-4 left-4 z-50"
           >
             <div
-              className="p-4 rounded-lg border border-gray-700 bg-black max-w-sm"
+              className={`p-4 rounded-lg border ${
+                darkMode
+                  ? "border-gray-700 bg-black"
+                  : "border-gray-300 bg-white"
+              } max-w-sm`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <div className="flex items-start space-x-3">
@@ -2158,7 +2449,13 @@ export default function HabitTracker() {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-medium">Daily Motivation</h4>
-                  <p className="text-sm text-gray-300 mt-1">{currentQuote}</p>
+                  <p
+                    className={`text-sm ${
+                      darkMode ? "text-gray-300" : "text-gray-600"
+                    } mt-1`}
+                  >
+                    {currentQuote}
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowMotivationalQuote(false)}
@@ -2195,20 +2492,28 @@ export default function HabitTracker() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${
+              darkMode ? "bg-black bg-opacity-70" : "bg-gray-500 bg-opacity-50"
+            } flex items-center justify-center z-50 p-4`}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md rounded-lg border border-gray-700 bg-black p-6"
+              className={`w-full max-w-md rounded-lg border ${
+                darkMode
+                  ? "border-gray-700 bg-black"
+                  : "border-gray-300 bg-white"
+              } p-6`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">Achievements</h3>
                 <button
                   onClick={() => setShowAchievements(false)}
-                  className="p-1 rounded-full hover:bg-gray-800"
+                  className={`p-1 rounded-full ${
+                    darkMode ? "hover:bg-gray-800" : "hover:bg-gray-200"
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -2231,23 +2536,29 @@ export default function HabitTracker() {
                 {achievements.map((achievement) => (
                   <div
                     key={achievement.id}
-                    className={`p-3 rounded-lg border border-gray-700 ${
-                      achievement.unlocked ? "border-green-500/30" : ""
-                    }`}
+                    className={`p-3 rounded-lg border ${
+                      darkMode ? "border-gray-700" : "border-gray-300"
+                    } ${achievement.unlocked ? "border-green-500/30" : ""}`}
                   >
                     <div className="flex items-center space-x-3">
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
                           achievement.unlocked
                             ? "bg-green-500/20"
-                            : "bg-gray-800"
+                            : darkMode
+                            ? "bg-gray-800"
+                            : "bg-gray-200"
                         }`}
                       >
                         {achievement.icon}
                       </div>
                       <div>
                         <h4 className="font-medium">{achievement.name}</h4>
-                        <p className="text-sm text-gray-300">
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        >
                           {achievement.description}
                         </p>
                       </div>
@@ -2299,20 +2610,28 @@ export default function HabitTracker() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            className={`fixed inset-0 ${
+              darkMode ? "bg-black bg-opacity-70" : "bg-gray-500 bg-opacity-50"
+            } flex items-center justify-center z-50 p-4`}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-md rounded-lg border border-gray-700 bg-black p-6"
+              className={`w-full max-w-md rounded-lg border ${
+                darkMode
+                  ? "border-gray-700 bg-black"
+                  : "border-gray-300 bg-white"
+              } p-6`}
               style={{ fontFamily: "Poppins, sans-serif" }}
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">Edit Profile</h3>
                 <button
                   onClick={() => setShowEditProfile(false)}
-                  className="p-1 rounded-full hover:bg-gray-800"
+                  className={`p-1 rounded-full ${
+                    darkMode ? "hover:bg-gray-800" : "hover:bg-gray-200"
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -2342,8 +2661,13 @@ export default function HabitTracker() {
                   <label className="block text-sm font-medium mb-1">Name</label>
                   <input
                     type="text"
-                    defaultValue="John Doe"
-                    className="w-full p-2 rounded border border-gray-700 bg-black"
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    className={`w-full p-2 rounded border ${
+                      darkMode
+                        ? "border-gray-700 bg-black"
+                        : "border-gray-300 bg-white"
+                    }`}
                   />
                 </div>
 
@@ -2353,8 +2677,13 @@ export default function HabitTracker() {
                   </label>
                   <input
                     type="email"
-                    defaultValue="john.doe@example.com"
-                    className="w-full p-2 rounded border border-gray-700 bg-black"
+                    value={profileEmail}
+                    onChange={(e) => setProfileEmail(e.target.value)}
+                    className={`w-full p-2 rounded border ${
+                      darkMode
+                        ? "border-gray-700 bg-black"
+                        : "border-gray-300 bg-white"
+                    }`}
                   />
                 </div>
 
@@ -2362,7 +2691,15 @@ export default function HabitTracker() {
                   <label className="block text-sm font-medium mb-1">
                     Time Zone
                   </label>
-                  <select className="w-full p-2 rounded border border-gray-700 bg-black">
+                  <select
+                    value={profileTimeZone}
+                    onChange={(e) => setProfileTimeZone(e.target.value)}
+                    className={`w-full p-2 rounded border ${
+                      darkMode
+                        ? "border-gray-700 bg-black"
+                        : "border-gray-300 bg-white"
+                    }`}
+                  >
                     <option>Eastern Time (ET)</option>
                     <option>Central Time (CT)</option>
                     <option>Mountain Time (MT)</option>
@@ -2374,7 +2711,19 @@ export default function HabitTracker() {
 
               <div className="mt-6">
                 <button
-                  onClick={() => setShowEditProfile(false)}
+                  onClick={() => {
+                    // Here we would normally save to a database
+                    // For now, just close the modal and show a notification
+                    setShowEditProfile(false);
+                    setNotifications([
+                      {
+                        id: Date.now(),
+                        message: "Profile updated successfully!",
+                        time: "just now",
+                      },
+                      ...notifications,
+                    ]);
+                  }}
                   className={`w-full py-2 ${getAccentColorClass(
                     "bg"
                   )} text-white rounded-lg ${getAccentColorClass("hover")}`}
@@ -2392,7 +2741,9 @@ export default function HabitTracker() {
   // Main render
   return (
     <div
-      className="min-h-screen bg-black text-white"
+      className={`min-h-screen ${
+        darkMode ? "bg-black text-white" : "bg-white text-gray-900"
+      }`}
       style={{ fontFamily: "Poppins, sans-serif" }}
     >
       {renderSidebar()}
