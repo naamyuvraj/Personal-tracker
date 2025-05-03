@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React from "react";
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LineChart,
@@ -301,8 +303,8 @@ export default function HabitTracker() {
   const [streakView, setStreakView] = useState("weekly");
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
-  const [profileName, setProfileName] = useState("John Doe");
-  const [profileEmail, setProfileEmail] = useState("john.doe@example.com");
+  const [profileName, setProfileName] = useState("Yuvraj");
+  const [profileEmail, setProfileEmail] = useState("naam.yuvraj@gmail.com");
   const [profileTimeZone, setProfileTimeZone] = useState("Eastern Time (ET)");
 
   // Refs
@@ -776,7 +778,7 @@ export default function HabitTracker() {
               />
             </svg>
           </button>
-          <h1 className="text-xl font-bold">Habit Tracker</h1>
+          <h1 className="text-2xl font-bold">Track Me</h1>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -971,201 +973,135 @@ export default function HabitTracker() {
             onClick={() => setShowEditProfile(true)}
             className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white"
           >
-            <span>JD</span>
+            <span>Y</span>
           </button>
         </div>
       </header>
     );
   };
 
-  const renderDashboard = () => {
-    const todayData = getTodayData();
-    const [flooded, setFlooded] = useState(false);
-    const prevWaterValue = useRef(0);
+  const Dashboard = React.memo(
+    ({ habits, streaks, darkMode, logHabit, getTodayData }) => {
+      const todayData = useMemo(() => getTodayData(), [getTodayData]);
 
-    const waterHabit = habits.find(
-      (habit) => habit.name.toLowerCase().replace(/\s+/g, "") === "water"
-    );
-    const waterName = "water";
-    const waterValue = todayData[waterName] || 0;
-    const target = waterHabit?.target || 0;
+      const isTargetExceeded = (habitKey: string, value: number) =>
+        value >
+        (habits.find(
+          (h) => h.name.toLowerCase().replace(/\s+/g, "") === habitKey
+        )?.target || 0);
 
-    // Trigger flood when crossing target
-    useEffect(() => {
-      if (waterValue >= target && prevWaterValue.current < target) {
-        setFlooded(true);
-        document.body.style.overflow = "hidden";
-        setTimeout(() => {
-          setFlooded(false);
-          document.body.style.overflow = "auto";
-        }, 6000);
-      }
-      prevWaterValue.current = waterValue;
-    }, [waterValue, target]);
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => {
-      setMounted(true);
-    }, []);
+      const renderHabitCard = useCallback(
+        (habit) => {
+          const habitKey = habit.name.toLowerCase().replace(/\s+/g, "");
+          const value = todayData[habitKey] || 0;
+          const isCompleted = value >= (habit.target || 0);
 
-    return (
-      <div className="relative">
-        <AnimatePresence>
-          {flooded && (
+          return (
             <motion.div
-              className="fixed inset-0 z-50 pointer-events-none overflow-hidden"
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={{
-                hidden: { y: "100%" },
-                visible: { y: 0 },
-              }}
-              transition={{ duration: 6, ease: "easeInOut" }}
+              key={habit.id}
+              initial={false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`p-4 rounded-lg border ${
+                darkMode
+                  ? "border-white bg-transparent"
+                  : "border-black bg-white"
+              }`}
+              style={{ fontFamily: "Poppins, sans-serif" }}
             >
-              {/* Water Wave */}
-              <svg
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 1440 320"
-                preserveAspectRatio="none"
-              >
-                <path
-                  fill="#3b82f6"
-                  fillOpacity="0.7"
-                  d="M0,256L48,245.3C96,235,192,213,288,213.3C384,213,480,235,576,234.7C672,235,768,213,864,186.7C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L0,320Z"
-                />
-              </svg>
-
-              {/* Bubbles */}
-              {[...Array(30)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute bg-blue-700 bg-opacity-40 rounded-full"
-                  style={{
-                    width: `${Math.random() * 16 + 8}px`,
-                    height: `${Math.random() * 16 + 8}px`,
-                    left: `${Math.random() * 100}%`,
-                  }}
-                  initial={{ y: "100%", opacity: 0.8 }}
-                  animate={{ y: "-20%", opacity: 0 }}
-                  transition={{
-                    duration: Math.random() * 3 + 3,
-                    delay: Math.random() * 2,
-                    ease: "easeOut",
-                    repeat: Infinity,
-                  }}
-                />
-              ))}
-
-              {/* Message */}
-              <motion.h2
-                className="absolute inset-0 flex items-center justify-center text-4xl md:text-5xl font-bold  drop-shadow-lg"
-                style={{
-                  color: darkMode ? "#3b82f6" : "#1d4ed8",
-                  textShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1, duration: 1 }}
-              >
-                💧 Water Target Reached!
-              </motion.h2>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Original Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {habits.map((habit) => {
-            const habitKey = habit.name.toLowerCase().replace(/\s+/g, "");
-            const value = todayData[habitKey] || 0;
-            const isCompleted = value >= (habit.target || 0);
-
-            return (
-              <motion.div
-                key={habit.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`p-4 rounded-lg border ${
-                  darkMode ? "border-white" : "border-black"
-                } ${darkMode ? "bg-transparent" : "bg-white"}`}
-                style={{ fontFamily: "Poppins, sans-serif" }}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-2">{habit.icon}</span>
-                    <div>
-                      <h3 className="font-medium">{habit.name}</h3>
-                      <p
-                        className={`text-sm ${
-                          darkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
-                      >
-                        Target: {habit.target} {habit.unit} ({habit.frequency})
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      isCompleted
-                        ? "bg-green-500"
-                        : darkMode
-                        ? "bg-gray-600"
-                        : "bg-gray-300"
-                    }`}
-                  ></div>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1">
-                    <span
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center">
+                  <span className="text-2xl mr-2">{habit.icon}</span>
+                  <div>
+                    <h3 className="font-medium">{habit.name}</h3>
+                    <p
                       className={`text-sm ${
                         darkMode ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
-                      Progress
-                    </span>
-                    <span
-                      className={`text-sm font-medium ${
-                        isTargetExceeded(habitKey, value)
-                          ? "text-red-500"
-                          : isCompleted
-                          ? "text-green-500"
-                          : ""
-                      }`}
-                      suppressHydrationWarning
-                    >
-                      {mounted
-                        ? `${value} / ${habit.target} ${habit.unit}`
-                        : `—`}
-                    </span>
-                  </div>
-
-                  <div
-                    className={`w-full h-2 ${
-                      darkMode ? "bg-gray-800" : "bg-gray-200"
-                    } rounded-full overflow-hidden`}
-                  >
-                    <div
-                      className={`h-full rounded-full ${
-                        habitKey === "water" && isCompleted
-                          ? "water-wave-animation"
-                          : getAccentColorClass("bg")
-                      }`}
-                      style={{
-                        width: mounted
-                          ? `${Math.min(100, (value / habit.target) * 100)}%`
-                          : "0%",
-                        transition: "width 0.5s ease-out",
-                      }}
-                    />
+                      Target: {habit.target} {habit.unit} ({habit.frequency})
+                    </p>
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-1">
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    isCompleted
+                      ? "bg-green-500"
+                      : darkMode
+                      ? "bg-gray-600"
+                      : "bg-gray-300"
+                  }`}
+                ></div>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-1">
+                  <span
+                    className={`text-sm ${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    Progress
+                  </span>
+                  <span
+                    className={`text-sm font-medium ${
+                      isTargetExceeded(habitKey, value) ? "text-green-500" : ""
+                    }`}
+                  >
+                    {value} / {habit.target} {habit.unit}
+                  </span>
+                </div>
+                <div
+                  className={`w-full h-2 ${
+                    darkMode ? "bg-gray-800" : "bg-gray-200"
+                  } rounded-full overflow-hidden relative`}
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      width: `${Math.min(100, (value / habit.target) * 100)}%`,
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className={`h-full rounded-full ${getAccentColorClass(
+                      "bg"
+                    )}`}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-yellow-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                  <span className="text-sm">
+                    {streaks[habitKey] || 0} day streak
+                  </span>
+                </div>
+
+                <div className="flex space-x-1">
+                  <button
+                    onClick={() => logHabit(habit.id, Math.max(0, value - 1))}
+                    className={`w-8 h-8 rounded-full ${
+                      darkMode ? "bg-gray-800" : "bg-gray-200"
+                    } flex items-center justify-center ${
+                      darkMode ? "hover:bg-gray-700" : "hover:bg-gray-300"
+                    }`}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-yellow-500"
+                      className="h-5 w-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -1174,71 +1110,53 @@ export default function HabitTracker() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                        d="M20 12H4"
                       />
                     </svg>
-                    <span className="text-sm">
-                      {mounted ? (streaks[habitKey] || 0) + " day streak" : "—"}
-                    </span>
-                  </div>
-
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => logHabit(habit.id, Math.max(0, value - 1))}
-                      className={`w-8 h-8 rounded-full ${
-                        darkMode ? "bg-gray-800" : "bg-gray-200"
-                      } flex items-center justify-center ${
-                        darkMode ? "hover:bg-gray-700" : "hover:bg-gray-300"
-                      }`}
+                  </button>
+                  <button
+                    onClick={() => logHabit(habit.id, value + 1)}
+                    className={`w-8 h-8 rounded-full ${getAccentColorClass(
+                      "bg"
+                    )} text-white flex items-center justify-center ${getAccentColorClass(
+                      "hover"
+                    )}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M20 12H4"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => logHabit(habit.id, value + 1)}
-                      className={`w-8 h-8 rounded-full ${getAccentColorClass(
-                        "bg"
-                      )} text-white flex items-center justify-center ${getAccentColorClass(
-                        "hover"
-                      )}`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                    </button>
-                  </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                  </button>
                 </div>
-              </motion.div>
-            );
-          })}
+              </div>
+            </motion.div>
+          );
+        },
+        [todayData, darkMode, streaks, logHabit]
+      );
+
+      return (
+        <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {habits.map(renderHabitCard)}
+          </div>
         </div>
-      </div>
-    );
-  };
+      );
+    }
+  );
+
   const renderCharts = () => {
+    // Prepare data for charts
     const last7Days = habitData.slice(-7);
     const chartData = last7Days.map((day) => ({
       date: format(parseISO(day.date), "MMM dd"),
@@ -1250,16 +1168,18 @@ export default function HabitTracker() {
       exercise: day.exercise,
     }));
 
+    // Get chart color based on accent color
     const getChartColor = () => {
-      const colorMap: Record<string, string> = {
+      const colorMap = {
         blue: "#3b82f6",
         green: "#10b981",
         yellow: "#f59e0b",
         purple: "#8b5cf6",
       };
-      return colorMap[accentColor] || "#3b82f6";
+      return colorMap[accentColor];
     };
 
+    // Light/dark mode stroke color
     const strokeColor = darkMode ? "#fff" : "#000";
     const tooltipBg = darkMode ? "#000" : "#fff";
     const tooltipBorder = darkMode ? "#333" : "#ccc";
@@ -1278,7 +1198,7 @@ export default function HabitTracker() {
         >
           <div
             className="flex justify-between items-center mb-4"
-            style={{ color: strokeColor }}
+            style={{ color: darkMode ? "#fff" : "#000" }}
           >
             <h3 className="font-medium">Activity Tracking</h3>
             <select
@@ -1286,9 +1206,9 @@ export default function HabitTracker() {
               onChange={(e) => setChartMetric(e.target.value)}
               className="text-sm p-1 rounded border"
               style={{
-                borderColor: darkMode ? "#4B5563" : "#D1D5DB",
+                borderColor: darkMode ? "#4B5563" : "#D1D5DB", // gray-700 or gray-300
                 backgroundColor: darkMode ? "#000" : "#fff",
-                color: strokeColor,
+                color: darkMode ? "#fff" : "#000",
               }}
             >
               <option value="sleep">Sleep</option>
@@ -1322,18 +1242,18 @@ export default function HabitTracker() {
                   strokeWidth={2}
                   name={`${
                     chartMetric.charAt(0).toUpperCase() + chartMetric.slice(1)
-                  } ${
+                  } (${
                     chartMetric === "sleep" || chartMetric === "screenTime"
-                      ? "(hours)"
-                      : "(minutes)"
-                  }`}
+                      ? "hours"
+                      : "minutes"
+                  })`}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
-        {/* Bar Chart with Wave Animation */}
+        {/* Bar Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1364,6 +1284,7 @@ export default function HabitTracker() {
                   dataKey="water"
                   name="Water (glasses)"
                   fill={getChartColor()}
+                  className="water-bar"
                   shape={(props) => {
                     const { x, y, width, height } = props;
                     return (
@@ -1380,7 +1301,8 @@ export default function HabitTracker() {
                           y={y}
                           width={width}
                           height={height}
-                          fill="url(#wavePattern)"
+                          className="water-fill-animation"
+                          fill="url(#waterPattern)"
                         />
                       </g>
                     );
@@ -1388,26 +1310,23 @@ export default function HabitTracker() {
                 />
                 <defs>
                   <pattern
-                    id="wavePattern"
+                    id="waterPattern"
                     patternUnits="userSpaceOnUse"
                     width="10"
                     height="10"
                     patternTransform="rotate(45)"
                   >
-                    <animateTransform
-                      attributeName="patternTransform"
-                      type="translate"
-                      from="0,0"
-                      to="10,10"
-                      dur="1s"
-                      repeatCount="indefinite"
-                    />
-                    <circle
-                      cx="5"
-                      cy="5"
-                      r="3"
+                    <rect
+                      width="10"
+                      height="10"
                       fill={getChartColor()}
-                      fillOpacity="0.4"
+                      fillOpacity="0.3"
+                    />
+                    <rect
+                      width="5"
+                      height="5"
+                      fill={getChartColor()}
+                      fillOpacity="0.5"
                     />
                   </pattern>
                 </defs>
@@ -1418,24 +1337,7 @@ export default function HabitTracker() {
       </div>
     );
   };
-  // import {
-  //   startOfWeek,
-  //   addDays,
-  //   startOfMonth,
-  //   endOfMonth,
-  //   isSameDay,
-  //   format,
-  //   parseISO,
-  //   getDate,
-  // } from "date-fns";
-
   const renderStreakCalendar = () => {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-      setMounted(true);
-    }, []);
-
     const today = new Date();
     const days = [];
 
@@ -1448,6 +1350,7 @@ export default function HabitTracker() {
       const monthStart = startOfMonth(today);
       const monthEnd = endOfMonth(today);
       let currentDay = monthStart;
+
       while (currentDay <= monthEnd) {
         days.push(new Date(currentDay));
         currentDay = addDays(currentDay, 1);
@@ -1486,6 +1389,7 @@ export default function HabitTracker() {
               <option value="reading">Reading</option>
               <option value="exercise">Exercise</option>
             </select>
+
             <select
               value={streakView}
               onChange={(e) => setStreakView(e.target.value)}
@@ -1545,11 +1449,13 @@ export default function HabitTracker() {
                     {day}
                   </div>
                 ))}
+
                 {Array.from({ length: startOfMonth(today).getDay() }).map(
                   (_, i) => (
                     <div key={`empty-${i}`} className="w-8 h-8"></div>
                   )
                 )}
+
                 {days.map((day, index) => {
                   const dateStr = format(day, "yyyy-MM-dd");
                   const dayData = habitData.find((d) => d.date === dateStr);
@@ -1597,9 +1503,7 @@ export default function HabitTracker() {
                     d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
-                <span suppressHydrationWarning>
-                  {mounted ? `${streaks[habitName] || 0} days` : "-"}
-                </span>
+                <span>Current streak: {streaks[habitName] || 0} days</span>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -1617,15 +1521,15 @@ export default function HabitTracker() {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span suppressHydrationWarning>
-                  {mounted
-                    ? `${Math.round(
-                        (habitData.filter((day) => day.completed?.[habitName])
-                          .length /
-                          habitData.length) *
-                          100
-                      )}%`
-                    : "-"}
+                <span>
+                  Completion rate:
+                  {Math.round(
+                    (habitData.filter((day) => day.completed?.[habitName])
+                      .length /
+                      habitData.length) *
+                      100
+                  )}
+                  %
                 </span>
               </div>
 
@@ -1644,10 +1548,8 @@ export default function HabitTracker() {
                     d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
                   />
                 </svg>
-                <span suppressHydrationWarning>
-                  {mounted
-                    ? `${Math.max(streaks[habitName] || 0, 1)} days`
-                    : "-"}
+                <span>
+                  Best streak: {Math.max(streaks[habitName] || 0, 1)} days
                 </span>
               </div>
 
@@ -2157,7 +2059,7 @@ export default function HabitTracker() {
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-white text-xl">
-                JD
+                Y
               </div>
               <div>
                 <h4 className="font-medium">{profileName}</h4>
@@ -2796,7 +2698,7 @@ export default function HabitTracker() {
               <div className="space-y-4">
                 <div className="flex justify-center mb-4">
                   <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-white text-2xl">
-                    JD
+                    Y
                   </div>
                 </div>
 
@@ -2882,9 +2784,18 @@ export default function HabitTracker() {
   };
 
   // Main render
+  const logHabitCallback = useCallback(
+    (id, value) => {
+      logHabit(id, value);
+    },
+    [logHabit]
+  );
+
+  const getTodayDataMemo = useCallback(() => getTodayData(), [getTodayData]);
+
   return (
     <div
-      className={`min-h-screen ${
+      className={`min-h-screen pb-6 pt-6 ${
         darkMode ? "bg-black text-white" : "bg-white text-gray-900"
       }`}
       style={{ fontFamily: "Poppins, sans-serif" }}
@@ -2895,7 +2806,15 @@ export default function HabitTracker() {
       <main className="container mx-auto px-4 py-6">
         {activeTab === "dashboard" && (
           <>
-            {renderDashboard()}
+            {
+              <Dashboard
+                habits={habits}
+                streaks={streaks}
+                darkMode={darkMode}
+                logHabit={logHabitCallback}
+                getTodayData={getTodayDataMemo}
+              />
+            }
             {renderCharts()}
             {renderStreakCalendar()}
             {renderDatePicker()}
