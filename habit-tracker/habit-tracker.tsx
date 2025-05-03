@@ -1474,7 +1474,7 @@ export default function HabitTracker() {
                         ${
                           isCompleted
                             ? getAccentColorClass("bg") + " text-white"
-                            : "bg-gray-800"
+                            : streakColor
                         }`}
                     >
                       {getDate(day)}
