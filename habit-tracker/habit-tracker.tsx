@@ -1399,8 +1399,9 @@ export default function HabitTracker() {
                   : "border-gray-300 bg-white text-black"
               }`}
             >
-              <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
+
+              <option value="weekly">Weekly</option>
             </select>
           </div>
         </div>
@@ -2795,7 +2796,7 @@ export default function HabitTracker() {
 
   return (
     <div
-      className={`min-h-screen pb-6 pt-6 ${
+      className={`min-h-screen pb-6 ${
         darkMode ? "bg-black text-white" : "bg-white text-gray-900"
       }`}
       style={{ fontFamily: "Poppins, sans-serif" }}
@@ -2803,7 +2804,7 @@ export default function HabitTracker() {
       {renderSidebar()}
       {renderHeader()}
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto py-6">
         {activeTab === "dashboard" && (
           <>
             {
