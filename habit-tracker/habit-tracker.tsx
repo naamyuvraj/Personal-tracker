@@ -748,235 +748,236 @@ export default function HabitTracker() {
 
   const renderHeader = () => {
     return (
-      <header
-        className={`p-4 flex justify-between items-center ${
-          darkMode ? "bg-black" : "bg-white"
-        } ${darkMode ? "text-white" : "text-gray-900"} border-b ${
-          darkMode ? "border-gray-800" : "border-gray-200"
-        }`}
-        style={{ fontFamily: "Poppins, sans-serif" }}
+<header
+  className={`p-4 flex justify-between items-center ${
+    darkMode ? "bg-black" : "bg-white"
+  } ${darkMode ? "text-white" : "text-gray-900"} border-b ${
+    darkMode ? "border-gray-800" : "border-gray-200"
+  }`}
+  style={{ fontFamily: "Poppins, sans-serif" }}
+>
+  <div className="flex items-center space-x-4">
+    <button
+      onClick={() => setSidebarOpen(true)}
+      className={`p-2 rounded-full ${
+        darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+      }`}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
       >
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className={`p-2 rounded-full ${
-              darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+    </button>
+    <h1 className="text-2xl font-bold flex-grow">Track Me</h1>
+  </div>
+
+  <div className="flex items-center space-x-4">
+    {/* Color options, only visible on larger screens */}
+    <div className="hidden sm:flex space-x-2">
+      <button
+        onClick={() => setAccentColor("blue")}
+        className={`w-6 h-6 rounded-full bg-blue-500 ${
+          accentColor === "blue" ? "ring-2 ring-white" : ""
+        }`}
+      ></button>
+      <button
+        onClick={() => setAccentColor("green")}
+        className={`w-6 h-6 rounded-full bg-green-500 ${
+          accentColor === "green" ? "ring-2 ring-white" : ""
+        }`}
+      ></button>
+      <button
+        onClick={() => setAccentColor("yellow")}
+        className={`w-6 h-6 rounded-full bg-yellow-500 ${
+          accentColor === "yellow" ? "ring-2 ring-white" : ""
+        }`}
+      ></button>
+      <button
+        onClick={() => setAccentColor("purple")}
+        className={`w-6 h-6 rounded-full bg-purple-500 ${
+          accentColor === "purple" ? "ring-2 ring-white" : ""
+        }`}
+      ></button>
+    </div>
+
+    <button
+      onClick={() => {
+        document.body.classList.add("mode-transition");
+        setDarkMode(!darkMode);
+        setTimeout(() => {
+          document.body.classList.remove("mode-transition");
+        }, 2000);
+      }}
+      className={`p-2 rounded-full ${
+        darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+      }`}
+    >
+      {darkMode ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+          />
+        </svg>
+      )}
+    </button>
+
+    <span className="text-yellow-500 font-medium border border-yellow-500/30 rounded-full px-3 py-1 flex items-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-1 text-yellow-500"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+        <path
+          fillRule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+          clipRule="evenodd"
+        />
+      </svg>
+      {xp} XP 
+    </span>
+
+    <div className="relative">
+      <button
+        onClick={() => setShowNotifications(!showNotifications)}
+        className={`p-2 rounded-full ${
+          darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
+        } relative`}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+        {notifications.length > 0 && (
+          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+            {notifications.length}
+          </span>
+        )}
+      </button>
+
+      {showNotifications && (
+        <div
+          className={`absolute right-0 mt-2 w-80 ${
+            darkMode ? "bg-black" : "bg-white"
+          } rounded-lg shadow-lg z-50 overflow-hidden border ${
+            darkMode ? "border-gray-800" : "border-gray-200"
+          }`}
+        >
+          <div
+            className={`p-3 border-b ${
+              darkMode ? "border-gray-800" : "border-gray-200"
             }`}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <h1 className="text-2xl font-bold">Track Me</h1>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setAccentColor("blue")}
-              className={`w-6 h-6 rounded-full bg-blue-500 ${
-                accentColor === "blue" ? "ring-2 ring-white" : ""
-              }`}
-            ></button>
-            <button
-              onClick={() => setAccentColor("green")}
-              className={`w-6 h-6 rounded-full bg-green-500 ${
-                accentColor === "green" ? "ring-2 ring-white" : ""
-              }`}
-            ></button>
-            <button
-              onClick={() => setAccentColor("yellow")}
-              className={`w-6 h-6 rounded-full bg-yellow-500 ${
-                accentColor === "yellow" ? "ring-2 ring-white" : ""
-              }`}
-            ></button>
-            <button
-              onClick={() => setAccentColor("purple")}
-              className={`w-6 h-6 rounded-full bg-purple-500 ${
-                accentColor === "purple" ? "ring-2 ring-white" : ""
-              }`}
-            ></button>
+            <h3 className="font-medium">Notifications</h3>
           </div>
 
-          <button
-            onClick={() => {
-              document.body.classList.add("mode-transition");
-              setDarkMode(!darkMode);
-              setTimeout(() => {
-                document.body.classList.remove("mode-transition");
-              }, 2000);
-            }}
-            className={`p-2 rounded-full ${
-              darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
-            }`}
-          >
-            {darkMode ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            )}
-          </button>
-
-          <span className="text-yellow-500 font-medium border border-yellow-500/30 rounded-full px-3 py-1 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-1 text-yellow-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {xp} XP (Lv. {level})
-          </span>
-
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`p-2 rounded-full ${
-                darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
-              } relative`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-              {notifications.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {notifications.length}
-                </span>
-              )}
-            </button>
-
-            {showNotifications && (
-              <div
-                className={`absolute right-0 mt-2 w-80 ${
-                  darkMode ? "bg-black" : "bg-white"
-                } rounded-lg shadow-lg z-50 overflow-hidden border ${
-                  darkMode ? "border-gray-800" : "border-gray-200"
-                }`}
-              >
+          {notifications.length > 0 ? (
+            <div className="max-h-96 overflow-y-auto">
+              {notifications.map((notification) => (
                 <div
+                  key={notification.id}
                   className={`p-3 border-b ${
                     darkMode ? "border-gray-800" : "border-gray-200"
-                  }`}
+                  } flex justify-between items-start`}
                 >
-                  <h3 className="font-medium">Notifications</h3>
+                  <div>
+                    <p
+                      className={`text-sm ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      } ${
+                        darkMode ? "bg-gray-800" : "bg-gray-100"
+                      } p-2 rounded`}
+                    >
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {notification.time}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => dismissNotification(notification.id)}
+                    className="text-gray-400 hover:text-gray-300"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
                 </div>
-
-                {notifications.length > 0 ? (
-                  <div className="max-h-96 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-3 border-b ${
-                          darkMode ? "border-gray-800" : "border-gray-200"
-                        } flex justify-between items-start`}
-                      >
-                        <div>
-                          <p
-                            className={`text-sm ${
-                              darkMode ? "text-gray-300" : "text-gray-700"
-                            } ${
-                              darkMode ? "bg-gray-800" : "bg-gray-100"
-                            } p-2 rounded`}
-                          >
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {notification.time}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => dismissNotification(notification.id)}
-                          className="text-gray-400 hover:text-gray-300"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-gray-400">
-                    No notifications
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <button
-            onClick={() => setShowEditProfile(true)}
-            className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white"
-          >
-            <span>Y</span>
-          </button>
+              ))}
+            </div>
+          ) : (
+            <div className="p-4 text-center text-gray-400">
+              No notifications
+            </div>
+          )}
         </div>
-      </header>
+      )}
+    </div>
+
+    <button
+      onClick={() => setShowEditProfile(true)}
+      className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white"
+    >
+      <span>Y</span>
+    </button>
+  </div>
+</header>
     );
   };
 
