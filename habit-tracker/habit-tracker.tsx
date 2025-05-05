@@ -749,14 +749,13 @@ export default function HabitTracker() {
   const renderHeader = () => {
     return (
       <header
-        className={`p-4 flex flex-wrap justify-between items-center gap-4 ${
-          darkMode
-            ? "bg-black text-white border-b border-gray-800"
-            : "bg-white text-gray-900 border-b border-gray-200"
+        className={`p-4 flex justify-between items-center ${
+          darkMode ? "bg-black" : "bg-white"
+        } ${darkMode ? "text-white" : "text-gray-900"} border-b ${
+          darkMode ? "border-gray-800" : "border-gray-200"
         }`}
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
-        {/* Left: menu & title */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -779,56 +778,50 @@ export default function HabitTracker() {
               />
             </svg>
           </button>
-          <h1 className="text-xl md:text-2xl font-bold">Track Me</h1>
+          <h1 className="text-2xl font-bold">Track Me</h1>
         </div>
 
-        {/* Right: controls */}
-        <div className="flex items-center flex-wrap gap-3 md:gap-4 ml-auto">
-          {/* Accent color selectors */}
+        <div className="flex items-center space-x-4">
           <div className="flex space-x-2">
-            {["blue", "green", "yellow", "purple"].map((color) => (
-              <button
-                key={color}
-                onClick={() => setAccentColor(color)}
-                className={`w-5 h-5 md:w-6 md:h-6 rounded-full bg-${color}-500 ${
-                  accentColor === color ? "ring-2 ring-white" : ""
-                }`}
-              />
-            ))}
+            <button
+              onClick={() => setAccentColor("blue")}
+              className={`w-6 h-6 rounded-full bg-blue-500 ${
+                accentColor === "blue" ? "ring-2 ring-white" : ""
+              }`}
+            ></button>
+            <button
+              onClick={() => setAccentColor("green")}
+              className={`w-6 h-6 rounded-full bg-green-500 ${
+                accentColor === "green" ? "ring-2 ring-white" : ""
+              }`}
+            ></button>
+            <button
+              onClick={() => setAccentColor("yellow")}
+              className={`w-6 h-6 rounded-full bg-yellow-500 ${
+                accentColor === "yellow" ? "ring-2 ring-white" : ""
+              }`}
+            ></button>
+            <button
+              onClick={() => setAccentColor("purple")}
+              className={`w-6 h-6 rounded-full bg-purple-500 ${
+                accentColor === "purple" ? "ring-2 ring-white" : ""
+              }`}
+            ></button>
           </div>
 
-          {/* Dark mode toggle */}
           <button
             onClick={() => {
               document.body.classList.add("mode-transition");
               setDarkMode(!darkMode);
-              setTimeout(
-                () => document.body.classList.remove("mode-transition"),
-                2000
-              );
+              setTimeout(() => {
+                document.body.classList.remove("mode-transition");
+              }, 2000);
             }}
             className={`p-2 rounded-full ${
               darkMode ? "hover:bg-gray-800" : "hover:bg-gray-100"
             }`}
           >
             {darkMode ? (
-              /* Moon icon */
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 118.646 3.646 9.003 9.003 0 0020.354 15.354z"
-                />
-              </svg>
-            ) : (
-              /* Sun icon */
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -843,11 +836,25 @@ export default function HabitTracker() {
                   d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
                 />
               </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
             )}
           </button>
 
-          {/* XP badge (hidden on xs) */}
-          <span className="hidden sm:flex items-center text-yellow-500 font-medium border border-yellow-500/30 rounded-full px-3 py-1">
+          <span className="text-yellow-500 font-medium border border-yellow-500/30 rounded-full px-3 py-1 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 mr-1 text-yellow-500"
@@ -864,7 +871,6 @@ export default function HabitTracker() {
             {xp} XP (Lv. {level})
           </span>
 
-          {/* Notifications */}
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
@@ -892,21 +898,77 @@ export default function HabitTracker() {
                 </span>
               )}
             </button>
+
             {showNotifications && (
-              /* your dropdown here */
               <div
-                className={`absolute right-0 mt-2 w-80 rounded-lg shadow-lg z-50 overflow-hidden border ${
-                  darkMode
-                    ? "bg-black border-gray-800"
-                    : "bg-white border-gray-200"
+                className={`absolute right-0 mt-2 w-80 ${
+                  darkMode ? "bg-black" : "bg-white"
+                } rounded-lg shadow-lg z-50 overflow-hidden border ${
+                  darkMode ? "border-gray-800" : "border-gray-200"
                 }`}
               >
-                {/* …notifications list… */}
+                <div
+                  className={`p-3 border-b ${
+                    darkMode ? "border-gray-800" : "border-gray-200"
+                  }`}
+                >
+                  <h3 className="font-medium">Notifications</h3>
+                </div>
+
+                {notifications.length > 0 ? (
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-3 border-b ${
+                          darkMode ? "border-gray-800" : "border-gray-200"
+                        } flex justify-between items-start`}
+                      >
+                        <div>
+                          <p
+                            className={`text-sm ${
+                              darkMode ? "text-gray-300" : "text-gray-700"
+                            } ${
+                              darkMode ? "bg-gray-800" : "bg-gray-100"
+                            } p-2 rounded`}
+                          >
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {notification.time}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => dismissNotification(notification.id)}
+                          className="text-gray-400 hover:text-gray-300"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-400">
+                    No notifications
+                  </div>
+                )}
               </div>
             )}
           </div>
 
-          {/* Profile avatar */}
           <button
             onClick={() => setShowEditProfile(true)}
             className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white"
@@ -917,28 +979,16 @@ export default function HabitTracker() {
       </header>
     );
   };
+
   const Dashboard = React.memo(
     ({ habits, streaks, darkMode, logHabit, getTodayData }) => {
-      const [hasMounted, setHasMounted] = useState(false);
-
-      useEffect(() => {
-        setHasMounted(true);
-      }, []);
-
-      const todayData = useMemo(
-        () => (hasMounted ? getTodayData() : {}),
-        [hasMounted, getTodayData]
-      );
+      const todayData = useMemo(() => getTodayData(), [getTodayData]);
 
       const isTargetExceeded = (habitKey: string, value: number) =>
         value >
         (habits.find(
           (h) => h.name.toLowerCase().replace(/\s+/g, "") === habitKey
         )?.target || 0);
-
-      const getAccentColorClass = (prefix: string) => {
-        return prefix === "bg" ? "bg-blue-500" : "hover:bg-blue-600"; // Update with your accent color logic if dynamic
-      };
 
       const renderHabitCard = useCallback(
         (habit) => {
@@ -1036,7 +1086,7 @@ export default function HabitTracker() {
                     />
                   </svg>
                   <span className="text-sm">
-                    {hasMounted ? streaks[habitKey] || 0 : 0} day streak
+                    {streaks[habitKey] || 0} day streak
                   </span>
                 </div>
 
@@ -1092,10 +1142,8 @@ export default function HabitTracker() {
             </motion.div>
           );
         },
-        [todayData, darkMode, streaks, logHabit, hasMounted]
+        [todayData, darkMode, streaks, logHabit]
       );
-
-      if (!hasMounted) return null;
 
       return (
         <div className="relative">
@@ -1106,6 +1154,7 @@ export default function HabitTracker() {
       );
     }
   );
+
   const renderCharts = () => {
     // Prepare data for charts
     const last7Days = habitData.slice(-7);
@@ -1310,20 +1359,8 @@ export default function HabitTracker() {
 
     const habitName = selectedHabitForStreak.toLowerCase().replace(/\s+/g, "");
     const streakColor = darkMode ? "bg-gray-800" : "bg-white";
-    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-      setMounted(true);
-    }, []);
-    if (!mounted) {
-      return (
-        <div className="flex justify-center items-center min-h-screen bg-black">
-          {/* You can use a spinner or skeleton loader here */}
-          <div className="loader text-white" >Loading...</div>
-        </div>
-      );
-    }
-        return (
+    return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -1362,9 +1399,8 @@ export default function HabitTracker() {
                   : "border-gray-300 bg-white text-black"
               }`}
             >
-              <option value="monthly">Monthly</option>
-
               <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
             </select>
           </div>
         </div>
@@ -1386,12 +1422,16 @@ export default function HabitTracker() {
                       </span>
                       <div
                         className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm
-                  ${isToday ? `border-2 ${getAccentColorClass("border")}` : ""}
-                  ${
-                    isCompleted
-                      ? getAccentColorClass("bg") + " text-white"
-                      : streakColor
-                  }`}
+                          ${
+                            isToday
+                              ? `border-2 ${getAccentColorClass("border")}`
+                              : ""
+                          }
+                          ${
+                            isCompleted
+                              ? getAccentColorClass("bg") + " text-white"
+                              : streakColor
+                          }`}
                       >
                         {format(day, "d")}
                       </div>
@@ -1426,12 +1466,16 @@ export default function HabitTracker() {
                     <div
                       key={index}
                       className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs
-                ${isToday ? `border ${getAccentColorClass("border")}` : ""}
-                ${
-                  isCompleted
-                    ? getAccentColorClass("bg") + " text-white"
-                    : streakColor
-                }`}
+                        ${
+                          isToday
+                            ? `border ${getAccentColorClass("border")}`
+                            : ""
+                        }
+                        ${
+                          isCompleted
+                            ? getAccentColorClass("bg") + " text-white"
+                            : streakColor
+                        }`}
                     >
                       {getDate(day)}
                     </div>
@@ -1440,6 +1484,7 @@ export default function HabitTracker() {
               </div>
             )}
           </div>
+
           <div className="border-l border-gray-700 pl-4">
             <h4 className="font-medium mb-3">Final Analysis</h4>
             <div className="space-y-3">
@@ -1458,9 +1503,7 @@ export default function HabitTracker() {
                     d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
-                <span>
-                  Current streak: {mounted ? streaks[habitName] || 0 : 0} days
-                </span>
+                <span>Current streak: {streaks[habitName] || 0} days</span>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -1479,18 +1522,17 @@ export default function HabitTracker() {
                   />
                 </svg>
                 <span>
-                  Completion rate:{" "}
-                  {mounted && habitData.length > 0
-                    ? Math.round(
-                        (habitData.filter((day) => day.completed?.[habitName])
-                          .length /
-                          habitData.length) *
-                          100
-                      )
-                    : 0}
+                  Completion rate:
+                  {Math.round(
+                    (habitData.filter((day) => day.completed?.[habitName])
+                      .length /
+                      habitData.length) *
+                      100
+                  )}
                   %
                 </span>
               </div>
+
               <div className="flex items-center space-x-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1507,8 +1549,7 @@ export default function HabitTracker() {
                   />
                 </svg>
                 <span>
-                  Best streak:{" "}
-                  {mounted ? Math.max(streaks[habitName] || 0, 1) : 0} days
+                  Best streak: {Math.max(streaks[habitName] || 0, 1)} days
                 </span>
               </div>
 
@@ -1527,11 +1568,6 @@ export default function HabitTracker() {
     );
   };
   const renderDatePicker = () => {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-      setMounted(true);
-    }, []);
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -1605,44 +1641,42 @@ export default function HabitTracker() {
             <h4 className="text-sm font-medium mb-2">
               Data for {format(selectedDate, "MMMM d, yyyy")}
             </h4>
-            <div className="space-y-3">
-              {mounted &&
-                habits.map((habit) => {
-                  const habitName = habit.name
-                    .toLowerCase()
-                    .replace(/\s+/g, "");
-                  const selectedDateData = getSelectedDateData();
-                  const value = selectedDateData[habitName] || 0;
-                  const isCompleted =
-                    selectedDateData.completed?.[habitName] || false;
 
-                  return (
-                    <div
-                      key={habit.id}
-                      className="flex justify-between items-center"
-                    >
-                      <div className="flex items-center">
-                        <span className="text-lg mr-2">{habit.icon}</span>
-                        <span>{habit.name}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span
-                          className={`mr-2 ${
-                            isCompleted ? "text-green-500" : "text-gray-400"
-                          }`}
-                        >
-                          {value} {habit.unit}
-                        </span>
-                        <div
-                          className={`w-3 h-3 rounded-full ${
-                            isCompleted ? "bg-green-500" : "bg-gray-600"
-                          }`}
-                        ></div>
-                      </div>
+            <div className="space-y-3">
+              {habits.map((habit) => {
+                const habitName = habit.name.toLowerCase().replace(/\s+/g, "");
+                const selectedDateData = getSelectedDateData();
+                const value = selectedDateData[habitName] || 0;
+                const isCompleted =
+                  selectedDateData.completed?.[habitName] || false;
+
+                return (
+                  <div
+                    key={habit.id}
+                    className="flex justify-between items-center"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-lg mr-2">{habit.icon}</span>
+                      <span>{habit.name}</span>
                     </div>
-                  );
-                })}
-            </div>{" "}
+                    <div className="flex items-center">
+                      <span
+                        className={`mr-2 ${
+                          isCompleted ? "text-green-500" : "text-gray-400"
+                        }`}
+                      >
+                        {value} {habit.unit}
+                      </span>
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          isCompleted ? "bg-green-500" : "bg-gray-600"
+                        }`}
+                      ></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </motion.div>
@@ -2761,7 +2795,7 @@ export default function HabitTracker() {
 
   return (
     <div
-      className={`min-h-screen pb-6 ${
+      className={`min-h-screen pb-6 pt-6 ${
         darkMode ? "bg-black text-white" : "bg-white text-gray-900"
       }`}
       style={{ fontFamily: "Poppins, sans-serif" }}
@@ -2769,7 +2803,7 @@ export default function HabitTracker() {
       {renderSidebar()}
       {renderHeader()}
 
-      <main className="container mx-auto py-6">
+      <main className="container mx-auto px-4 py-6">
         {activeTab === "dashboard" && (
           <>
             {
