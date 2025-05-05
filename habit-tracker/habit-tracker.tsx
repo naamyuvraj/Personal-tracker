@@ -1315,8 +1315,15 @@ export default function HabitTracker() {
     useEffect(() => {
       setMounted(true);
     }, []);
-    if (!mounted) return null;
-    return (
+    if (!mounted) {
+      return (
+        <div className="flex justify-center items-center min-h-screen bg-black">
+          {/* You can use a spinner or skeleton loader here */}
+          <div className="loader text-white" >Loading...</div>
+        </div>
+      );
+    }
+        return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
